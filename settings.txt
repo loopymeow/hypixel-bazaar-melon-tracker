@@ -1,4 +1,4 @@
-blue
+purple
 100
 icon
 

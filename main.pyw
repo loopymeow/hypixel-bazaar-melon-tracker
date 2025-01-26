@@ -4,7 +4,6 @@ import sys, time, datetime
 import pygame
 from pygame.locals import *
 #(beautifulsoup imports)
-from bs4 import BeautifulSoup
 import requests
 
 # window settings
@@ -17,44 +16,27 @@ pygame.font.init()
 pygame.display.set_caption("hypixel skyblock bazaar tracker :3")
 
 def scrapeData(ench_count):
-    url_list = ["https://skyblock.finance/items/GOLD_INGOT",
-                "https://skyblock.finance/items/MELON",
-                "https://skyblock.finance/items/ENCHANTED_GLISTERING_MELON"]
-    url_count = 0
-    for url in url_list:
-        if url_count < 3:
-            target_index = 4
+    try:
+        response = requests.get("https://api.hypixel.net/skyblock/bazaar")
+        data = response.json()
+
+        if response.status_code == 200 and data.get("success"):
+            ingot_buy = data["products"].get("GOLD_INGOT",                 {}).get("quick_status", {}).get("buyPrice")
+            melon_buy = data["products"].get("MELON",                      {}).get("quick_status", {}).get("buyPrice")
+            ench_sell = data["products"].get("ENCHANTED_GLISTERING_MELON", {}).get("quick_status", {}).get("sellPrice")
+
+            ingot_buy = round(ingot_buy, 1)
+            melon_buy = round(melon_buy, 1)
+            ench_sell = round(ench_sell, 1)
+
+            #updateData(ingot_buy, melon_buy, ench_sell, ench_count)
+            saveData(ingot_buy, melon_buy, ench_sell, ench_count) 
+
         else:
-            target_index = 0
-        response = requests.get(url)
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, 'html.parser')
-            elements_by_class = soup.find_all(class_='LabelValue_value__v87U1')
-            index=0
-            for element in elements_by_class:
-                if index == target_index:
-                    result = str(element.get_text())
-                    result = result[0:len(result)-6]
-                    for char in result:
-                        if char == "k":
-                            result = result[0:len(result)-1]
-                            result = float(result)*1000
-                    print(result)
-                index+=1
-            if url_count == 0:
-                global ingot_buy
-                ingot_buy = float(result)
-            elif url_count == 1:
-                global melon_buy
-                melon_buy = float(result)
-            else:
-                global ench_sell
-                ench_sell = float(result)
-        else:
-            print("Failed to retrieve the page")
-        url_count += 1
-        updateData(ingot_buy, melon_buy, ench_sell, ench_count)
-        saveData(ingot_buy, melon_buy, ench_sell, ench_count)
+            print("data not yet available")
+
+    except Exception:
+        print("error scraping data")
 
 def loadData():
     # ingot
@@ -296,8 +278,6 @@ def main():
   tempstring = ""
 
   # loading from files
-  ingot_buy, melon_buy, ench_sell, ench_count = loadData()
-  data_list, overall_profit = updateData(ingot_buy, melon_buy, ench_sell, ench_count)
   theme, scalar, details = loadingSettings()
   reloadImages(WIDTH, HEIGHT)
 
@@ -429,12 +409,12 @@ def main():
               tempstring += event.unicode
               print(tempstring)
     # application loop
+    ingot_buy, melon_buy, ench_sell, ench_count = loadData()
+    data_list, overall_profit = updateData(ingot_buy, melon_buy, ench_sell, ench_count)
     drawWindow(scene, theme, details, tempstring, scalar, changing, data_list, overall_profit, sync)
     fpsClock.tick(FPS)
     if sync == True:
-        if datetime.datetime.now().second == 0:
-            print("updating data...")
-            scrapeData(ench_count)
-            time.sleep(1)
-
+        print("updating data...")
+        time.sleep(1)
+        scrapeData(ench_count)
 main()

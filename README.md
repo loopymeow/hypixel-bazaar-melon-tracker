@@ -1,27 +1,27 @@
 # Hypixel Bazaar Melon Tracker
 
-This application tracks (every minute) the current buy and sell prices related to melons on the Skyblock minigame on the Hypixel server in Minecraft. It aims to tell you whether or not the "melon method" is profitable at the moment as well as monitoring profits with custom inputs.
+This application tracks (every minute) the current buy and sell prices related to melons on the Skyblock minigame on the Hypixel server in Minecraft. It aims to tell you whether or not the "melon method" is currently profitable using the Hypixel API as well as monitoring profits with custom inputs.
 
 ## Requirements
 
 Install python on your computer:
 https://www.python.org/downloads/
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install pygame and beautifulsoup.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install pygame and requests.
 
 ```bash
 pip install pygame
 ```
 
 ```bash
-pip install requests beautifulsoup4
+pip install requests
 ```
 
 ## Features
 - Customiseable Theme
 - Resizeable
 - Icons/text toggle
-- Buy and sell prices update every 1 minute
+- Buy and sell prices update every 1 second
 - Autosave
 - Custom artwork
 
