@@ -1,4 +1,4 @@
-pink
+blue
 100
 icon
 
